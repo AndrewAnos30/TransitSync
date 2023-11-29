@@ -20,6 +20,7 @@ class CustomUser(AbstractUser):
     )
 
     carType =(
+        ('None','None'),
         ('PUJ', 'PUJ'),
         ('Modernized PUJ', 'Modernized PUJ'),
         ('AirConditioned PUJ', 'AirConditioned PUJ'),
@@ -45,7 +46,7 @@ class CustomUser(AbstractUser):
     QR = models.ImageField(upload_to="qrs/", null=True, blank=True)
     verified = models.BooleanField(default=False, null=True, blank= True)
     UserGroup = models.CharField(max_length=100, null=True, blank=True)
-    TransportationType = models.CharField(max_length=100,choices= carType, null=True, blank=True, default='PUJ')
+    TransportationType = models.CharField(max_length=100,choices= carType, null=True, blank=True, default='None')
 
 
 

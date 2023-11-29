@@ -1,0 +1,1 @@
+web gunicorn  TransitSync.wsgi:application --log-file -

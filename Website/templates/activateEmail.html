@@ -9,6 +9,6 @@ Your QR Code has been generated and is available in your TransitSync account wal
 {% if user.QR %}
     QR Code: <img src="{{ user.QR.url }}" alt="QR Code">
 {% else %}
-    <p></p>
+
 {% endif %}
 Serial Number: {{ user.userSN }}

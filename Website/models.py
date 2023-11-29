@@ -5,9 +5,9 @@ from users.models import CustomUser
 
     
 class DataCrawl (models.Model):
-    CrawlDate = models.CharField (max_length=200, null=True, blank=True)
-    CrawlPHP = models.FloatField (null=True, blank=True)
-    CrawlUSD = models.FloatField (null=True, blank=True)
+    CrawlDate = models.CharField (max_length=200, null=True, blank=True, default=0)
+    CrawlPHP = models.FloatField (null=True, blank=True, default=0)
+    CrawlUSD = models.FloatField (null=True, blank=True, default=0)
 
     def __str__(self):
         return self.CrawlDate 

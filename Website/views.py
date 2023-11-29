@@ -50,10 +50,6 @@ def activateEmailw(request, user, to_email):
     # Create an EmailMessage instance
     email = EmailMessage(mail_subject, message, to=[to_email])
 
-    # Attach the QR code image to the email
-    qr_image_path = user.QR.path  # Assuming 'QR' is an ImageField in your model
-    email.attach_file(qr_image_path)
-
     if email.send():
         messages.success(request, f'Dear <b>{user.username}</b>, please go to your email <b>{to_email}</b> inbox and click on the received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
     else:
