@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
     'whitenoise',
     'phonenumber_field',
+    'storages'
 
 ]
 
@@ -83,16 +84,24 @@ WSGI_APPLICATION = 'TransitSync.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'das1upjf186t1l',
+        'USER': 'upmyucgdjeuelk',
+        'PASSWORD': '369a94ee8bbe6f4efb147a4f3146db7a683ca7b6df0c2c7aef0a0ac94f0f1fc4',
+        'HOST': 'ec2-52-1-92-133.compute-1.amazonaws.com',
+        'PORT': '5432',  
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
