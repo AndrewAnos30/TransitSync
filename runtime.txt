@@ -1,1 +1,1 @@
-pythong-3.10.6
+pythong-3.12.0
