@@ -154,4 +154,14 @@ AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+AWS_ACCESS_KEY_ID = 'AKIA6RF4UELZVEWXHTTB '
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'transitsync'
+AWS_S3_SIGNATURE_NAME = 's3v4',
+AWS_S3_REGION_NAME = 'ap-southeast-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
 django_heroku.settings(locals())
