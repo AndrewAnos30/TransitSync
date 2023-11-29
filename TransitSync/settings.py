@@ -152,16 +152,18 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 LOGIN_REDIRECT_URL = '/'
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
 
 AWS_ACCESS_KEY_ID = 'AKIA6RF4UELZVEWXHTTB '
 AWS_SECRET_ACCESS_KEY = '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'
