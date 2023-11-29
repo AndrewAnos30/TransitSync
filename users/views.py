@@ -38,7 +38,7 @@ def activateEmail(request, user, to_email):
     email = EmailMessage(mail_subject, message, to=[to_email])
 
     # Attach the QR code image to the email
-    qr_image_path = user.QR.path  # Assuming 'QR' is an ImageField in your model
+    qr_image_path = user.QR.url  # Assuming 'QR' is an ImageField in your model
     email.attach_file(qr_image_path)
 
     if email.send():
