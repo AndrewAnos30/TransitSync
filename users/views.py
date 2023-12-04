@@ -22,6 +22,7 @@ from .forms import UserUpdateForm
 from .forms import PasswordResetForm
 from django.db.models.query_utils import Q
 
+from users.models import CustomUser
 
 
 def activateEmail(request, user, to_email):
@@ -37,9 +38,17 @@ def activateEmail(request, user, to_email):
     # Create an EmailMessage instance
     email = EmailMessage(mail_subject, message, to=[to_email])
 
+    # Get QR code content
+    qr_image_content = user.QR.read()
+
     # Attach the QR code image to the email
-    qr_image_path = user.QR.url  # Assuming 'QR' is an ImageField in your model
-    email.attach_file(qr_image_path)
+    email.attach(f'qr_{user.userSN}.png', qr_image_content, 'image/png')
+
+    if email.send():
+        messages.success(request, f'Dear <b>{user.username}</b>, please go to your email <b>{to_email}</b> inbox and click on the received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
+    else:
+        messages.error(request, f'Problem sending confirmation email to {to_email}, check if you typed it correctly.')
+
 
     if email.send():
         messages.success(request, f'Dear <b>{user.username}</b>, please go to your email <b>{to_email}</b> inbox and click on the received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
@@ -71,7 +80,6 @@ def activate(request, uidb64, token):
 # Create your views here.
 @user_not_authenticated
 def registerCommuter(request):
-
     placeholders = {
         'contactNumber_placeholder': '09*********',
         'emergencyContact_placeholder': '09*********',
@@ -80,19 +88,18 @@ def registerCommuter(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)  # Create the user object without saving it
+            user = form.save(commit=False)
             user.email = form.cleaned_data['email']
-            user.is_active=False
-            
-
+            user.is_active = False
 
             # Generate a unique userSN
             userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
 
-
             # Set UserGroup to "Commuter"
             user.UserGroup = "user"
             user.userSN = userSN
+
+            # Generate QR code
             qr_data = f"TransitSynch:{userSN}"
             qr = qrcode.QRCode(
                 version=1,
@@ -105,11 +112,15 @@ def registerCommuter(request):
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
             img.save(buffer, format="PNG")
-            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
 
+            # Save QR code to the user's QR field
+            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=True)
 
             user.save()
+
+            # Use the user instance in activateEmail
             activateEmail(request, user, form.cleaned_data.get('email'))
+
             return redirect('login')
 
         else:

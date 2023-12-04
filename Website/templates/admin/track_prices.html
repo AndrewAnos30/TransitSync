@@ -145,7 +145,7 @@ th{
   display: none;
   position: fixed;
   z-index: 1;
-  margin-top: -6%;
+  margin-top: -7%;
   left: 0;
   top: 0;
   width: 100%;
@@ -290,18 +290,22 @@ th{
         </div>
         <div class="modal-body mx-3">
 
-          <form method="post">
+        <form method="post">
             {% csrf_token %}
         
         
             <div class="form-group"> 
 
-          {{ kilometer_form.kilometers.label_tag }} {{ kilometer_form.kilometers }}
-        </div>
+              {{ kilometer_form.kilometers.label_tag }} 
 
-        <div class="form-group" style="margin-left: 20px;"> 
-          {{ kilometer_form.car_type.label_tag }} {{ kilometer_form.car_type }}
-        </div>
+              <input type="number" name="kilometers" step="1" class="form-control validate">
+              
+              <!-- {{ kilometer_form.kilometers}} --> 
+            </div>
+
+            <div class="form-group" style="margin-left: 20px;"> 
+              {{ kilometer_form.car_type.label_tag }} {{ kilometer_form.car_type }}
+            </div>
   
           {% if fare is not None %}
           <p style="font-size: 20px;">Total Fare: <strong>₱{{ fare|floatformat:2 }}</strong></p>
@@ -362,7 +366,7 @@ th{
           <td>₱{{ latest_price.CurrentDiesel|floatformat:2 }}</td>
         </tr>
         <tr>
-          <td><strong><button id="show-update-prices-button" onclick="toggleUpdatePricesForm()" class="btn-change2" style="margin-right: 50px;">Show
+          <td><strong><button id="show-update-prices-button" onclick="toggleUpdatePricesForm()" class="btn-change2" style="float: left;">Show
                 Form</button>
             </strong></td>
           <td></td>
@@ -427,7 +431,7 @@ th{
               <input type="hidden" name="fifth_calculation_result" value="{{ fifth_calculation_result }}">
               <input type="hidden" name="sixth_calculation_result" value="{{ sixth_calculation_result }}">
               <input type="hidden" name="php_price" value="{{ php_price }}">
-              <button type="submit" class="btn-change3" style="margin-right: 50px;">Save</button>
+              <button type="submit" class="btn-change3" style="float: left;">Save</button>
             </form>
           </td>
           <td></td>
@@ -466,7 +470,7 @@ th{
               <input type="hidden" name="date" value="{{ date }}">
               <input type="hidden" name="php_price" value="{{ php_price }}">
               <input type="hidden" name="usd_price" value="{{ usd_price }}">
-              <button type="submit" class="btn-change" style="margin-right: 50px;">Save Data</button>
+              <button type="submit" class="btn-change" style="float: left;">Save Data</button>
             </form>
           </td>
           <td></td>
@@ -478,7 +482,7 @@ th{
 
 
   <!-- Modal container initially hidden -->
-  <div id="modal-container" class="modal-container">
+  <div id="modal-container" class="modal-container" >
     <div class="modal-content">
       <div class="modal-header text-center">
         <h4 class="modal-title w-100 font-weight-bold"> Update Prices</h4>
@@ -486,35 +490,37 @@ th{
 
 
       </div>
+
+
       <div class="modal-body">
         <form method="post" action="{% url 'update_prices' %}">
           {% csrf_token %}
          
-            <div class="form-group">
+            <div class="md-form">
               <label for="new_fare">New Fare PUJ:</label>
 
-              <input type="number" name="new_farePUJ" step="0.01">
+              <input type="number" name="new_farePUJ" step="0.01" class="form-control validate">
 
             </div>
 
-            <div class="form-group">
+            <div class="md-form">
               <label for="new_succeeding">New Succeeding PUJ:</label>
-              <input type="number" name="new_succeedingPUJ" step="0.01">
+              <input type="number" name="new_succeedingPUJ" step="0.01" class="form-control validate">
             </div>
 
-            <div class="form-group">
+            <div class="md-form">
               <label for="new_fare">New Fare Bus:</label>
-              <input type="number" name="new_fareBus" step="0.01">
+              <input type="number" name="new_fareBus" step="0.01" class="form-control validate">
             </div>
 
-            <div class="form-group">
+            <div class="md-form">
               <label for="new_succeeding">New Succeeding Bus:</label>
-              <input type="number" name="new_succeedingBus" step="0.01">
+              <input type="number" name="new_succeedingBus" step="0.01" class="form-control validate">
             </div>
 
-            <div class="form-group">
+            <div class="md-form">
               <label for="new_diesel">Diesel Price:</label>
-              <input type="number" name="new_diesel" step="0.01">
+              <input type="number" name="new_diesel" step="0.01" class="form-control validate">
             </div>
 
       </div>

@@ -330,14 +330,12 @@ def UWallet(request):
     fare = CurrentPrice.objects.filter(Num='1')
     user = request.user
 
-
-
-    context ={
+    context = {
     'fare' : fare,
     'user': user,
     }
 
-    return render(request, 'commuter/UWallet.html',context)
+    return render(request, 'commuter/UWallet.html', context)
 
 @login_required
 def UTransaction(request):

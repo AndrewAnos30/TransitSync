@@ -108,15 +108,15 @@ body::-webkit-scrollbar {
                     <a href="{% url 'validation' %}" style="text-decoration: none; color: white;">Validate</a>
                 </button>
                 
-                <div class="dashboard-buttons">
+                <div class="dashboard-buttons" style="margin-top: 30px;">
                     <h2>Create Users: </h2>
 
 
-                <button class="dashboard-button">
+                <button class="dashboard-button" >
                     <a href="{% url 'create_conductor' %}" style="text-decoration: none; color: white;">Create Conductor</a>
                 </button>
 
-                <button class="dashboard-button">
+                <button class="dashboard-button" style="margin-top: 30px;">
                     <a href="{% url 'create_cashier' %}" style="text-decoration: none; color: white;">Create Cashier</a>
                 </button>
          
@@ -126,7 +126,7 @@ body::-webkit-scrollbar {
             </div>
             <div class="img col-lg-6 col-md-6 col-12 w-50 pt-3 pb-5">
                 
-                <img class="img-fluid" src="{% get_media_prefix %}images/account.png">
+                <img class="img-fluid" src="{%  static 'images/account.png' %}">
  
             
             </div>
