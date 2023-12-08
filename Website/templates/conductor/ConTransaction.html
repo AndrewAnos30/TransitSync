@@ -14,6 +14,30 @@
  </head>
 
  <style>
+#kmNoneCount {
+    background-color: none;
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border: 1px solid #ddd; /* Border color */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Box shadow for embossed effect */
+    display: flex; /* Enable flexbox for positioning */
+    align-items: center; /* Center vertically */
+}
+
+#greenDot {
+    width: 10px;
+    height: 10px;
+    background-color: #4CAF50; /* Green color for the dot */
+    border-radius: 50%; /* Make it circular */
+    margin-right: 8px; /* Adjust the spacing between the dot and text */
+}
+
+
 .feedback {
   background-color : rgb(3, 84, 122);
   color: white;
@@ -234,8 +258,8 @@ thead th.asc span.icon-arrow{
      <main class="table">
          <section class="table__header">
              <h1 >Transaction History</h1>
-     
-            
+             <p id="kmNoneCount"></p>
+
          </section>
 
          <section class="table__body">
@@ -429,6 +453,17 @@ const toCSV = function (table) {
 
 
      </script>
+         <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Count records with 'km' as None
+                const kmNoneCount = Array.from(document.querySelectorAll('tbody tr'))
+                    .filter(row => row.querySelector('td:nth-child(5)').textContent.trim() === 'None')
+                    .length;
+    
+                // Update the count in the HTML
+                document.getElementById('kmNoneCount').textContent = `${kmNoneCount}`;
+            });
+        </script>
  </body>
  {% endblock content %}
  </html>
