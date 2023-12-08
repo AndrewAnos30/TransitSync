@@ -322,7 +322,7 @@ def welcome(request):
 def commuter(request):
 
 
-    return render(request, 'commuter/userHome.html')
+    return render(request, 'commuter/UserHome.html')
 
 @login_required
 def UWallet(request):
