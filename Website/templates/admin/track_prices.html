@@ -16,7 +16,7 @@
     body {
         font-family: 'Raleway', sans-serif;
         min-height: 100vh;
-        background: url("{% get_media_prefix %}bg/scan2.jpg") center/cover no-repeat;
+        background: url("{% static 'bg/scan2.jpg' %}") center/cover no-repeat;
 
     }
 
@@ -290,39 +290,34 @@ th{
         </div>
         <div class="modal-body mx-3">
 
-        <form method="post">
+          <form method="post">
             {% csrf_token %}
         
+            <div class="form-group">
+                <label for="id_kilometers">{{ kilometer_form.kilometers.label }}</label>
+                <input type="number" name="kilometers" step="1" class="form-control validate" id="id_kilometers">
+                <!-- Display errors if any -->
+                {{ kilometer_form.kilometers.errors }}
+            </div>
         
-            <div class="form-group"> 
-
-              {{ kilometer_form.kilometers.label_tag }} 
-
-              <input type="number" name="kilometers" step="1" class="form-control validate">
-              
-              <!-- {{ kilometer_form.kilometers}} --> 
+            <div class="form-group">
+                <label for="id_car_type">{{ kilometer_form.car_type.label }}</label>
+                {{ kilometer_form.car_type }}
+                <!-- Display errors if any -->
+                {{ kilometer_form.car_type.errors }}
             </div>
-
-            <div class="form-group" style="margin-left: 20px;"> 
-              {{ kilometer_form.car_type.label_tag }} {{ kilometer_form.car_type }}
+        
+            {% if fare is not None %}
+            <p style="font-size: 20px;">Total Fare: <strong>₱{{ fare|floatformat:2 }}</strong></p>
+            {% else %}
+            <p>Total Fare: <strong>₱0.00</strong></p>
+            {% endif %}
+        
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="submit" class="btn-change4">Calculate Fare</button>
             </div>
-  
-          {% if fare is not None %}
-          <p style="font-size: 20px;">Total Fare: <strong>₱{{ fare|floatformat:2 }}</strong></p>
-          {% else %}
-          <p>Total Fare: <strong>₱0.00</strong></p>
-          {% endif %}
-  
-
-  
-        </div>
-        <div class="modal-footer d-flex justify-content-center">
-          <button type="submit" class="btn-change4" >Calculate Fare</button>
-
-        </div>
-
-
-      </form>
+        </form>
+        
       </div>
     </div>
   </div>

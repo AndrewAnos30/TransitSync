@@ -4,6 +4,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,7 +87,15 @@
         </div>
     </section>
 
-
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% static "sw.js" %}').then(function(reg) {
+                console.log('Service worker has been registered for scope:', reg.scope);
+            }).catch(function(error) {
+                console.error('Error registering service worker:', error);
+            });
+        }
+    </script>
    <!-- Prism JS -->
    <script src="{% static 'prism.js' %}"></script>
 
@@ -145,7 +155,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url("{% get_media_prefix %}bg/home.jpg") center/cover no-repeat; 
+    background: url("{% static 'bg/home.jpg' %}") center/cover no-repeat; 
 }
 
 .container{
