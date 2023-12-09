@@ -248,6 +248,7 @@ thead th.active span.icon-arrow{
                         <th>User SN</th>
                         <th>Balance</th>
                         <th>Graduation</th>
+                        <th>Valid ID</th>
                         <th>Verified</th>
                         <th>User Group</th>
                         <th>Validate</th>
@@ -271,6 +272,31 @@ thead th.active span.icon-arrow{
                         <td>{{ user.userSN }}</td>
                         <td>{{ user.balance }}</td>
                         <td>{{ user.graduation }}</td>
+                        <td>
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#validIDModal{{ user.id }}">
+                                View Valid ID
+                            </button>
+                            <!-- Valid ID Modal -->
+                            <div class="modal fade" id="validIDModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="validIDModalLabel{{ user.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="validIDModalLabel{{ user.id }}">Valid ID</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% if user.validID %}
+                                                <img src="{{ user.validID.url }}" alt="Valid ID" class="img-fluid">
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
                         <td>{{ user.verified }}</td>
                         <td>{{ user.UserGroup }}</td>
                         <td>
