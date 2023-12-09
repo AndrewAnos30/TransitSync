@@ -155,7 +155,7 @@ def custom_login(request):
             )
             if user is not None and user.verified:  # Check if the user is verified
                 login(request, user)
-                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
+                messages.success(request, f"Hello {user.username}! You have been logged in")
                 
                 # Check the UserGroup and redirect accordingly
                 if user.UserGroup == "user":
