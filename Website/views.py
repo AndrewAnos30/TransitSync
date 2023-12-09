@@ -434,6 +434,8 @@ def create_conductor(request):
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
+            return redirect('account_management')  # Redirect back to account management in case of an error
+
 
     else:
         form = ConductorRegistrationForm()
@@ -479,6 +481,8 @@ def create_cashier(request):
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
+            return redirect('account_management')  # Redirect back to account management in case of an error
+
 
     else:
         form = CashierRegistrationForm()
