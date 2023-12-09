@@ -120,6 +120,7 @@ def ConTransaction(request):
     records = TransportationRecord.objects.all()
 
     for record in records:
+        print(f"Debug: Processing record {record.id}")
         if record.latitudeIN is not None and record.longitudeIN is not None and record.latitudeOUT is not None and record.longitudeOUT is not None:
             origin = (record.latitudeIN, record.longitudeIN)
             destination = (record.latitudeOUT, record.longitudeOUT)
@@ -137,167 +138,108 @@ def ConTransaction(request):
                 try:
                     user = CustomUser.objects.get(userSN=record.extracted_data)
                     record.commuterStatus = user.status  # Set the commuterStatus to the user's status
-                except CustomUser.DoesNotExist:
+                except CustomUser.DoesNotExist as e:
                     # Handle the case when no matching user is found (e.g., set a default status)
+                    print(f"Error: {e}")
                     record.commuterStatus = "Unknown"
 
                 try:
                     user = CustomUser.objects.get(userSN=record.user)
-                    record.TranspoType = user.TransportationType  # Set the commuterStatus to the user's status
-                except CustomUser.DoesNotExist:
-                    # Handle the case when no matching user is found (e.g., set a default status)
-                    record.commuterStatus = "Unknown"
+                    record.TranspoType = user.TransportationType  # Set the TranspoType to the user's type
+                except CustomUser.DoesNotExist as e:
+                    # Handle the case when no matching user is found (e.g., set a default type)
+                    print(f"Error: {e}")
+                    record.TranspoType = "Unknown"
+
                 record.save()
+
     for record in records:
-        if record.km is not None and record.TranspoType == "PUJ":
-            try:
-                current_price = CurrentPrice.objects.get(Num=1)
-                initial_price = CurrentPrice.objects.filter(Num=1).first()
-                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+        if record.km is not None:
+            print(f"Debug: Calculating price for record {record.id}")
+            if record.TranspoType == "PUJ":
+                try:
+                    current_price = CurrentPrice.objects.get(Num=1)
+                    initial_price = CurrentPrice.objects.filter(Num=1).first()
+                    succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-                initial_distance = 4.10
-                succeeding_distance = max(0, record.km - initial_distance)
-                rounded_succeeding_distance = math.ceil(succeeding_distance)
+                    initial_distance = 4.10
+                    succeeding_distance = max(0, record.km - initial_distance)
+                    rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-                # Set the multiplier based on the commuterStatus
-                multiplier = 1.0 if record.commuterStatus == "Ordinary" else 0.80
+                    # Set the multiplier based on the commuterStatus
+                    multiplier = 1.0 if record.commuterStatus == "Ordinary" else 0.80
 
-                record.price = (
-                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                    else (initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)) * multiplier
-                )
+                    record.price = (
+                        current_price.CurrentFarePUJ * multiplier if record.km < 4.10
+                        else (initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)) * multiplier
+                    )
 
-                user = CustomUser.objects.get(userSN=record.extracted_data)
-                if user.balance is not None and user.balance >= record.price:
-                    user.balance -= record.price
-                    user.save()
-                else:
-                    # Handle insufficient balance or other cases
-                    pass
-
-            except (CurrentPrice.DoesNotExist, CustomUser.DoesNotExist):
-                # Handle the case when no matching CurrentPrice or user is found
-                record.price = 0  # Set a default price
-
-            record.save()
-
-        elif record.km is not None and record.TranspoType == "Modernized PUJ":
-            try:
-                current_price = CurrentPrice.objects.get(Num=1)
-                initial_price = CurrentPrice.objects.filter(Num=1).first()
-                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
-
-                initial_distance = 4.10
-                succeeding_distance = max(0, record.km - initial_distance)
-                rounded_succeeding_distance = math.ceil(succeeding_distance)
-
-                # Set the multiplier based on the commuterStatus
-                multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
-
-                record.price = (
-                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                    else (initial_price.CurrentFarePUJ * multiplier) + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)
-                )
+                    user = CustomUser.objects.get(userSN=record.extracted_data)
+                    if user.balance is not None and user.balance >= record.price:
+                        user.balance -= record.price
+                        user.save()
+                    else:
+                        # Handle insufficient balance or other cases
+                        print(f"Debug: Insufficient balance for user {user.userSN} - Balance: {user.balance}, Price: {record.price}")
+                except (CurrentPrice.DoesNotExist, CustomUser.DoesNotExist) as e:
+                    # Handle the case when no matching CurrentPrice or user is found
+                    print(f"Error: {e}")
+                    record.price = 0  # Set a default price
 
                 record.save()
 
-            except CurrentPrice.DoesNotExist:
-                # Handle the case when no matching CurrentPrice is found
-                record.price = 0  # Set a default price
-            record.save()
-    # Additional logic for other cases can be added as needed
+            elif record.TranspoType == "Modernized PUJ":
+                try:
+                    current_price = CurrentPrice.objects.get(Num=1)
+                    initial_price = CurrentPrice.objects.filter(Num=1).first()
+                    succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-        elif record.km is not None and record.TranspoType == "AirConditioned PUJ":
-            try:
-                current_price = CurrentPrice.objects.get(Num=1)
-                initial_price = CurrentPrice.objects.filter(Num=1).first()
-                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+                    initial_distance = 4.10
+                    succeeding_distance = max(0, record.km - initial_distance)
+                    rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-                initial_distance = 4.10
-                succeeding_distance = max(0, record.km - initial_distance)
-                rounded_succeeding_distance = math.ceil(succeeding_distance)
+                    # Set the multiplier based on the commuterStatus
+                    multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
 
-                # Set the multiplier based on the commuterStatus
-                multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
+                    record.price = (
+                        current_price.CurrentFarePUJ * multiplier if record.km < 4.10
+                        else (initial_price.CurrentFarePUJ * multiplier) + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)
+                    )
 
-                record.price = (
-                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                    else (initial_price.CurrentFarePUJ * multiplier) + ((succeeding_price.CurrentSucceedingPUJ * multiplier) * rounded_succeeding_distance)
-                )
+                    record.save()
 
-                record.save()
-
-            except CurrentPrice.DoesNotExist:
-                # Handle the case when no matching CurrentPrice is found
-                record.price = 0  # Set a default price
-            record.save()
-
-        elif record.km is not None and record.TranspoType == "Regular Bus":
-            try:
-                current_price = CurrentPrice.objects.get(Num=1)
-                initial_price = CurrentPrice.objects.filter(Num=1).first()
-                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
-
-                initial_distance = 4.10
-                succeeding_distance = max(0, record.km - initial_distance)
-                rounded_succeeding_distance = math.ceil(succeeding_distance)
-
-                record.price = (
-                    current_price.CurrentFareBus if record.km < 5.10
-                    else initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingBus * rounded_succeeding_distance)
-                )
+                except CurrentPrice.DoesNotExist as e:
+                    # Handle the case when no matching CurrentPrice is found
+                    print(f"Error: {e}")
+                    record.price = 0  # Set a default price
 
                 record.save()
 
-            except CurrentPrice.DoesNotExist:
-                # Handle the case when no matching CurrentPrice is found
-                record.price = 0  # Set a default price
-            record.save()
-
-
-        elif record.km is not None and record.TranspoType == "Modernized Bus":
-            try:
-                current_price = CurrentPrice.objects.get(Num=1)
-                initial_price = CurrentPrice.objects.filter(Num=1).first()
-                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
-
-                initial_distance = 4.10
-                succeeding_distance = max(0, record.km - initial_distance)
-                rounded_succeeding_distance = math.ceil(succeeding_distance)
-
-                record.price = (
-                    current_price.CurrentFareBus if record.km < 4.10
-                    else initial_price.CurrentFarePUJ + ((succeeding_price.CurrentFareBus * 1.20) * rounded_succeeding_distance)
-                )
-
-                record.save()
-
-            except CurrentPrice.DoesNotExist:
-                # Handle the case when no matching CurrentPrice is found
-                record.price = 0  # Set a default price
-            record.save()
+            # Additional elif blocks for other TranspoTypes can be added as needed
 
     unprocessed_records = TransportationRecord.objects.filter(processed=False)
 
     for transportation_record in unprocessed_records:
-     if transportation_record.price is not None:
+        if transportation_record.price is not None:
+            print(f"Debug: Processing unprocessed record {transportation_record.id}")
+            # Find the matching CustomUser based on userSN
+            try:
+                user = CustomUser.objects.get(userSN=transportation_record.extracted_data)
+            except CustomUser.DoesNotExist as e:
+                # Handle the case where there is no matching user
+                # You may want to log this or handle it accordingly
+                print(f"Error: {e}")
+                continue
 
-        # Find the matching CustomUser based on userSN
-        try:
-            user = CustomUser.objects.get(userSN=transportation_record.extracted_data)
-        except CustomUser.DoesNotExist:
-            # Handle the case where there is no matching user
-            # You may want to log this or handle it accordingly
-            continue
+            # Process the deduction from balance
+            user.balance -= transportation_record.price
+            user.save()
 
-        # Process the deduction from balance
-        user.balance -= transportation_record.price
-        user.save()
+            # Mark the TransportationRecord as processed
+            transportation_record.processed = True
+            transportation_record.save()
 
-        # Mark the TransportationRecord as processed
-        transportation_record.processed = True
-        transportation_record.save()
-
+    print("Debug: End of view function")    
     return render(request, 'conductor/ConTransaction.html', {'records': records})
 
 
