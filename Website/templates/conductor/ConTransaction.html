@@ -282,6 +282,7 @@ thead th.asc span.icon-arrow{
                          <th style="min-width:150px;"> Longitude IN </th>
                          <th style="min-width:150px;"> Latitude OUT </th>
                          <th style="min-width:150px;"> Longitude OUT </th>
+                         <th style="min-width:150px;">  </th>
                          
                        
                       
@@ -298,7 +299,7 @@ thead th.asc span.icon-arrow{
                         <td style="text-align: center; vertical-align: middle;">
                             <p class="status delivered" > {{ record.commuterStatus }} </p></td>
                         <td style="text-align: center; vertical-align: middle;">{{ record.km }}</td>
-                        <td style="text-align: center; vertical-align: middle;">{{ record.price }}</td>
+                        <td style="text-align: center; vertical-align: middle;">₱{{ record.price }}</td>
          
                         <td style="text-align: center; vertical-align: middle;">{{ record.latitudeIN }}</td>
                         <td style="text-align: center; vertical-align: middle;">{{ record.longitudeIN }}</td>
@@ -317,7 +318,19 @@ thead th.asc span.icon-arrow{
                                 N/A
                             {% endif %}
                         </td>
-                      
+                        <td>
+                            {% if record.price is not None %}
+                                {% if record.penalty %}
+                                    <span style="color: red;">PAID</span>
+                                {% else %}
+                                    <span style="color: green;">PAID</span>
+                                {% endif %}
+                            {% else %}
+                                <button onclick="updateKilometers('{{ record.TranspoSN }}')">Penalty</button>
+                            {% endif %}
+                        </td>
+                        
+                        
 
                     </tr>
                     {% endfor %}
@@ -325,7 +338,52 @@ thead th.asc span.icon-arrow{
                  </tbody>
              </table>
            
-        
+             <script>
+                function updateKilometers(transpoSN) {
+                    // You can use AJAX or fetch to make an asynchronous request to your Django view
+                    // Pass the transpoSN to your view to identify the record to update
+                    // Update the km using the routeKM of the currently logged-in user
+            
+                    // Example using fetch:
+                    fetch(`/update_km/${transpoSN}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')  // Ensure to include CSRF token
+                        },
+                        body: JSON.stringify({ transpoSN: transpoSN }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle the response or update the UI as needed
+                        console.log(data);
+
+                        location.reload();
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            
+                // Function to get CSRF token from cookies
+                function getCookie(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            // Check if the cookie name matches with the desired name
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+            </script>
+            
          </section>
      </main>
      <div id="mybutton">

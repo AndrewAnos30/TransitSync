@@ -24,7 +24,7 @@ class ConductorRegistrationForm(UserCreationForm):
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                          'DPA','TransportationType' ]
+                          'DPA','TransportationType', 'routeKM', 'routeName' ]
         
         
     def save(self, commit=True):

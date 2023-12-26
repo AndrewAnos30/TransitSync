@@ -1,6 +1,7 @@
 {% extends "header.html" %}
 {% block content %}
 {% load static %}
+{% load tz %}
 <script
       type="module"
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
@@ -242,13 +243,16 @@ body {
 </header>
     <div id="container">
         <h2> Hello, {{user.username}}! </h2>
-        <p>Your balance as of (currentdate)</p>
+        <p>Your balance as of <a id="date"></a>    </p>
         <div id="wallet">
-            
-            <h2 >₱{{ user.balance|floatformat:2|default:0.00 }}</h2>
-           <i class="fa fa-plus"></i>
+            {% if user.balance < 0 %}
+                <h2> -₱{{ user.balance|floatformat:2|default:0.00|slice:'1:' }}</h2>
+            {% else %}
+                <h2>₱{{ user.balance|floatformat:2|default:0.00 }}</h2>
+            {% endif %}
+            <i class="fa fa-plus"></i>
         </div>
-   
+        
     </div>
     
    
@@ -400,5 +404,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-
+<script>
+    // Get current date and time
+    var now = new Date();
+    var date = now.toLocaleString();
+  
+    // Insert date and time into HTML
+    document.getElementById("date").innerHTML = date;
+  </script>
 {% endblock content %}

@@ -34,6 +34,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import TransportationRecord
 import googlemaps
 import math
+from django.core.mail import send_mail
+from django.urls import reverse
 
 
 # Create your views here.
@@ -67,7 +69,7 @@ def generate_random_transpo_sn(length=25):
     return ''.join(secrets.choice(characters) for _ in range(length))
 
 @csrf_exempt
-@login_required  
+   
 def scan_qr_code(request):
     if request.method == 'POST':
         scan_type = request.POST.get('scan_type')
@@ -75,12 +77,10 @@ def scan_qr_code(request):
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
 
-        # Get the currently logged-in user's userSN
-        user = request.user  # Assuming you have set up user authentication
+        user = request.user  
         userSN = user.userSN
 
         if scan_type == 'out':
-            # Update existing records with the same extracted data and scan type "in"
             updated_records = TransportationRecord.objects.filter(extracted_data=extracted_data, scan_type='in')
             if updated_records.exists():
                 updated_records.update(
@@ -92,10 +92,8 @@ def scan_qr_code(request):
                 return JsonResponse({'error': 'Not yet scanned in'})
 
         elif scan_type == 'in':
-            # Generate a unique 25-character TranspoSN
             transpo_sn = generate_random_transpo_sn()
 
-            # Create a new TransportationRecord instance and save it to the database
             record = TransportationRecord(
                 scan_type=scan_type,
                 extracted_data=extracted_data,
@@ -104,7 +102,7 @@ def scan_qr_code(request):
                 latitudeOUT=None,
                 longitudeOUT=None,
                 TranspoSN=transpo_sn,
-                user=userSN  # Assign the userSN of the currently logged-in user
+                user=userSN  
             )
 
             record.save()
@@ -114,40 +112,35 @@ def scan_qr_code(request):
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
 
-@login_required
+ 
 def ConTransaction(request):
     gmaps = googlemaps.Client(key='AIzaSyCQbrn9uYAhVxweNwKpYb5yBYaVURtC6oM')
     records = TransportationRecord.objects.all()
 
     for record in records:
         print(f"Debug: Processing record {record.id}")
-        if record.latitudeIN is not None and record.longitudeIN is not None and record.latitudeOUT is not None and record.longitudeOUT is not None:
+        if record.latitudeIN is not None and record.longitudeIN is not None and record.latitudeOUT is not None and record.longitudeOUT is not None and record.penalty is not True:
             origin = (record.latitudeIN, record.longitudeIN)
             destination = (record.latitudeOUT, record.longitudeOUT)
 
-            # Use the Google Maps Distance Matrix API to calculate driving distance
             result = gmaps.distance_matrix(origin, destination, mode="driving")
 
-            # Extract and store the distance in the record
             if 'rows' in result and result['rows'][0]['elements'][0]['status'] == 'OK':
-                distance = result['rows'][0]['elements'][0]['distance']['value'] / 1000.0  # Convert meters to kilometers
+                distance = result['rows'][0]['elements'][0]['distance']['value'] / 1000.0  
                 record.km = distance
                 record.save()
 
-                # Find a CustomUser with the matching userSN
                 try:
                     user = CustomUser.objects.get(userSN=record.extracted_data)
-                    record.commuterStatus = user.status  # Set the commuterStatus to the user's status
+                    record.commuterStatus = user.status  
                 except CustomUser.DoesNotExist as e:
-                    # Handle the case when no matching user is found (e.g., set a default status)
                     print(f"Error: {e}")
                     record.commuterStatus = "Unknown"
 
                 try:
                     user = CustomUser.objects.get(userSN=record.user)
-                    record.TranspoType = user.TransportationType  # Set the TranspoType to the user's type
+                    record.TranspoType = user.TransportationType  
                 except CustomUser.DoesNotExist as e:
-                    # Handle the case when no matching user is found (e.g., set a default type)
                     print(f"Error: {e}")
                     record.TranspoType = "Unknown"
 
@@ -166,7 +159,6 @@ def ConTransaction(request):
                     succeeding_distance = max(0, record.km - initial_distance)
                     rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-                    # Set the multiplier based on the commuterStatus
                     multiplier = 1.0 if record.commuterStatus == "Ordinary" else 0.80
 
                     record.price = (
@@ -179,12 +171,10 @@ def ConTransaction(request):
                         user.balance -= record.price
                         user.save()
                     else:
-                        # Handle insufficient balance or other cases
                         print(f"Debug: Insufficient balance for user {user.userSN} - Balance: {user.balance}, Price: {record.price}")
                 except (CurrentPrice.DoesNotExist, CustomUser.DoesNotExist) as e:
-                    # Handle the case when no matching CurrentPrice or user is found
                     print(f"Error: {e}")
-                    record.price = 0  # Set a default price
+                    record.price = 0 
 
                 record.save()
 
@@ -198,7 +188,6 @@ def ConTransaction(request):
                     succeeding_distance = max(0, record.km - initial_distance)
                     rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-                    # Set the multiplier based on the commuterStatus
                     multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
 
                     record.price = (
@@ -209,38 +198,74 @@ def ConTransaction(request):
                     record.save()
 
                 except CurrentPrice.DoesNotExist as e:
-                    # Handle the case when no matching CurrentPrice is found
                     print(f"Error: {e}")
-                    record.price = 0  # Set a default price
+                    record.price = 0 
 
                 record.save()
-
-            # Additional elif blocks for other TranspoTypes can be added as needed
 
     unprocessed_records = TransportationRecord.objects.filter(processed=False)
 
     for transportation_record in unprocessed_records:
         if transportation_record.price is not None:
             print(f"Debug: Processing unprocessed record {transportation_record.id}")
-            # Find the matching CustomUser based on userSN
             try:
                 user = CustomUser.objects.get(userSN=transportation_record.extracted_data)
             except CustomUser.DoesNotExist as e:
-                # Handle the case where there is no matching user
-                # You may want to log this or handle it accordingly
+
                 print(f"Error: {e}")
                 continue
 
-            # Process the deduction from balance
             user.balance -= transportation_record.price
             user.save()
 
-            # Mark the TransportationRecord as processed
             transportation_record.processed = True
             transportation_record.save()
 
     print("Debug: End of view function")    
     return render(request, 'conductor/ConTransaction.html', {'records': records})
+
+def update_km(request, transpoSN):
+    if request.method == 'POST':
+        # Get the logged-in user
+        user = request.user
+
+        try:
+            # Get the corresponding TransportationRecord
+            record = TransportationRecord.objects.get(TranspoSN=transpoSN)
+            
+            # Update the km using the routeKM of the currently logged-in user
+            record.km = user.routeKM
+            record.latitudeOUT = 0
+            record.longitudeOUT = 0
+            record.penalty = True
+            record.TranspoType = user.TransportationType
+            record.save()
+
+            try:
+                custom_user = CustomUser.objects.get(userSN=record.extracted_data)
+                record.commuterStatus = custom_user.status
+
+                # Get the email of the CustomUser and send an email with a formatted message
+                if custom_user.email:
+                    subject = 'TransitSync - Deduction Notification'
+                    message = render_to_string('email/deduction.txt', {'user': custom_user, 'record': record})
+                    send_mail(
+                        subject,
+                        message,
+                        'transitsync.capstone2@gmail.com',  # Replace with your email address
+                        [custom_user.email],
+                        fail_silently=False,
+                    )
+            except CustomUser.DoesNotExist:
+                record.commuterStatus = "Unknown"
+
+            record.save()
+
+            return JsonResponse({'status': 'success', 'message': 'KM updated successfully'})
+        except TransportationRecord.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Record not found'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
 def homepage(request):
@@ -260,13 +285,13 @@ def welcome(request):
     # If the user is not authenticated or doesn't match any specific group, show the welcome page
     return render(request=request, template_name='welcome.html')
 
-@login_required
+ 
 def commuter(request):
 
 
     return render(request, 'commuter/UserHome.html')
 
-@login_required
+ 
 def UWallet(request):
 
     fare = CurrentPrice.objects.filter(Num='1')
@@ -279,19 +304,20 @@ def UWallet(request):
 
     return render(request, 'commuter/UWallet.html', context)
 
-@login_required
+
+
 def UTransaction(request):
 
     records = TransportationRecord.objects.all()
     return render(request, 'commuter/UTransaction.html', {'records': records})
 
-@login_required
+ 
 def UTransactionCashier(request):
 
     records = CashierTransaction.objects.all()
     return render(request, 'commuter/UTransactionCashier.html', {'records': records})
 
-@login_required
+ 
 def cashier(request):
     query = request.GET.get('q')
 
@@ -311,19 +337,19 @@ def cashier(request):
 
     return render(request, 'cashier/cashierHome.html', {'results': results, 'query': query})
 
-@login_required
+ 
 def cTransaction(request):
     records = CashierTransaction.objects.all()
     return render(request, 'cashier/cashierTransaction.html', {'records': records})
 
-@login_required
+ 
 def update_balance(request, user_id):
     commuter = get_object_or_404(CustomUser, id=user_id)  # Get the user being updated
 
     if request.method == 'POST':
         # Update the user's balance here
         new_balance = request.POST.get('balance')
-        commuter.balance = new_balance
+        commuter.balance = float(commuter.balance) + float(new_balance)
 
         # Generate a unique TransactionID
         transaction_id = generate_transaction_id()
@@ -334,12 +360,10 @@ def update_balance(request, user_id):
         # Get the UserSN of the logged-in cashier
         cashierSN = request.user.userSN  # Assuming UserSN is the field in CustomUser model
 
-
         # Create a new CashierTransaction entry
         paid_amount = request.POST.get('amount')
         if paid_amount:
-
-            change = float(new_balance) - float(paid_amount)
+            change = float(paid_amount) - float(new_balance)
 
             transaction = CashierTransaction(
                 TransactionID=transaction_id,
@@ -352,11 +376,29 @@ def update_balance(request, user_id):
             )
             transaction.save()
 
+            # Send email to the user with the cashed-in amount and change
+            subject = 'Balance Update Notification'
+            message = render_to_string('email/balance_update_notification.txt', {
+                'username': commuter.username,
+                'cashed_in_amount': new_balance,
+                'paid_amount': paid_amount,
+                'change': change,
+            })
+            from_email = 'transitsync.capstone2@gmail.com'
+            recipient_list = [commuter.email]
+
+            send_mail(
+                subject,
+                message,
+                from_email,
+                recipient_list,
+                fail_silently=False,
+            )
+
         commuter.save()  # Save the commuter's updated balance
         messages.success(request, 'Balance updated successfully!')
 
-
-        return HttpResponseRedirect('/cashier/')  # Redirect to the cashier page
+        return HttpResponseRedirect(reverse('cashier'))  # Redirect to the cashier page
 
     return render(request, 'cashierHome.html', {'user': commuter})
 
@@ -364,44 +406,94 @@ def update_balance(request, user_id):
 def generate_transaction_id():
     return ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(25))
 
-@login_required
+ 
 def CashierScan(request):
 
     return render(request, 'cashier/scanning.html')
 
-@login_required
+ 
 def conductor(request):
 
     return render(request=request, template_name='conductor/conductorHome.html')
 
 
-@login_required
+ 
 def admin(request):
 
 
     return render(request=request, template_name='admin/adminPage.html')
 
-@login_required
+ 
 def account_management(request):
 
     return render(request,'admin/account/accountManagement.html' )
 
-@login_required
+ 
 def validation(request):
     commuter_users = CustomUser.objects.all
 
     return render(request,'admin/account/validate.html', {'commuter_users': commuter_users} )
 
+ 
 def update_validation(request, user_id):
-    user = get_object_or_404(CustomUser, id=user_id)
-    
-    # Update the validation status to True
-    user.verified = True
-    user.save()
-    
+    try:
+        user = CustomUser.objects.get(pk=user_id)
+        user.verified = True
+        user.save()
+
+        # Send email to the user with the validation notification
+        subject = 'Account Validation Notification'
+        message = render_to_string('email/validation_notification.txt', {
+            'username': user.username,
+        })
+        from_email = 'your_company@example.com'
+        recipient_list = [user.email]
+
+        send_mail(
+            subject,
+            message,
+            from_email,
+            recipient_list,
+            fail_silently=False,
+        )
+
+        messages.success(request, 'Account validated and approved. Email notification sent.')
+    except CustomUser.DoesNotExist:
+        messages.error(request, 'User does not exist.')
+
     return redirect('validation')
 
-@login_required
+def delete_user(request, user_id):
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '')
+        try:
+            user = CustomUser.objects.get(pk=user_id)
+            username = user.username
+            user_email = user.email
+            user.delete()
+            messages.success(request, 'User deleted successfully.')
+            
+            # Send email to the user with the deletion reason
+            subject = 'Account Deletion Notification'
+            message = render_to_string('email/delete_user_notification.txt', {
+                'username': username,
+                'deletion_reason': reason,
+            })
+            from_email = 'transitsync.capstone2@gmail.com'
+            recipient_list = [user_email]
+
+            send_mail(
+                subject,
+                message,
+                from_email,
+                recipient_list,
+                fail_silently=False,
+            )
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'User does not exist.')
+    return redirect('account_management')
+
+ 
 def create_conductor(request):
 
     placeholders = {
@@ -447,7 +539,8 @@ def create_conductor(request):
     )
 
 
-@login_required
+
+ 
 def create_cashier(request):
 
     placeholders = {
@@ -494,7 +587,7 @@ def create_cashier(request):
     )
 
 
-@login_required
+ 
 def track_prices(request):
     url = "https://www.globalpetrolprices.com/Philippines/"
     result = requests.get(url)
@@ -605,21 +698,21 @@ def track_prices(request):
 
     return render(request, 'admin/track_prices.html', context)
 
-@login_required
+ 
 def transaction_AT(request):
     
     records = TransportationRecord.objects.all()
     
     return render(request, 'admin/TransactionAT.html', {'records': records})
 
-@login_required
+ 
 def transaction_AC(request):
     
     records = CashierTransaction.objects.all()
     
     return render(request, 'admin/TransactionAC.html', {'records': records})
 
-@login_required
+ 
 def save_data(request):
     if request.method == "POST":
         # Get the data from the context
@@ -637,7 +730,7 @@ def save_data(request):
         # Handle GET requests to this view as needed
         pass
 
-@login_required
+ 
 def update_prices(request):
     if request.method == 'POST':
         # Get the new values for CurrentFare, CurrentDiesel, and CurrentSucceeding from the form
@@ -674,7 +767,7 @@ def update_prices(request):
 
     return render(request, 'admin/track_price.html')
 
-@login_required
+ 
 def update_current_price(request):
     if request.method == 'POST':
         # Retrieve the third and fourth calculation results from the POST data

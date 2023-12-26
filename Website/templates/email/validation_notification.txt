@@ -1,0 +1,12 @@
+Subject: Account Validation Notification
+
+Dear {{ username }},
+
+We are pleased to inform you that your account on our platform has been validated and approved.
+
+If you have any questions or need further assistance, please feel free to contact our support team.
+
+Thank you for choosing our platform.
+
+Best regards,
+TransitSync

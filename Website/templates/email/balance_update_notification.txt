@@ -1,0 +1,16 @@
+Subject: CASHIN NotificatioN
+
+Dear {{ username }},
+
+We want to inform you that your account balance has been updated successfully.
+
+Cashed-in Amount: ₱{{ cashed_in_amount }}
+tendered-amount: ₱{{paid_amount}}
+Change: ₱{{ change }}
+
+If you have any questions or concerns, please contact our support team.
+
+Thank you for using our platform.
+
+Best regards,
+TransitSync

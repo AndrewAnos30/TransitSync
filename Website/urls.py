@@ -33,6 +33,7 @@ urlpatterns = [
     path('scan_qr_code/', views.scan_qr_code, name='scan_qr_code'),
     path('transaction_AT/', views.transaction_AT, name='transaction_AT'),
     path('transaction_AC/', views.transaction_AC, name='transaction_AC'),
-
+    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
+    path('update_km/<str:transpoSN>/', views.update_km, name='update_km'),
 
 ]

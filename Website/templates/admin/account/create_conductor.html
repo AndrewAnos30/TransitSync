@@ -50,12 +50,12 @@
 
                 <div class="fields">
                     <div class="input-field">
-                        <label for="id_first_name">First Name<span class="required">*</span></label>
+                        <label for="id_first_name">First Name<span style="color: red;" class="required">*</span></label>
                         <input type="text" class="form-control" id="id_first_name" name="first_name" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_last_name">Last Name<span class="required">*</span></label>
+                        <label for="id_last_name">Last Name<span style="color: red;" class="required">*</span></label>
                         <input type="text" class="form-control" id="id_last_name" name="last_name" required>
                     </div>
 
@@ -65,17 +65,17 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="id_age">Age<span class="required">*</span></label>
+                        <label for="id_age">Age<span style="color: red;" class="required">*</span></label>
                         <input type="number" class="form-control" id="id_age" name="age" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_birthDate">Date of Birth<span class="required">*</span></label>
+                        <label for="id_birthDate">Date of Birth<span style="color: red;" class="required">*</span></label>
                         <input type="date" class="form-control" id="id_birthDate" name="birthDate" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_contactNumber">Contact Number<span class="required">*</span></label>
+                        <label for="id_contactNumber">Contact Number<span style="color: red;" class="required">*</span></label>
                         <input type="tel" class="form-control" id="id_contactNumber" name="contactNumber" placeholder="09*********"  maxlength="11" required>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
 
                 <div class="fields">
                     <div class="input-field">
-                        <label for="id_gender">Transportation Type<span class="required">*</span></label>
+                        <label for="id_gender">Transportation Type<span style="color: red;" class="required">*</span></label>
                         <select class="form-control" id="id_TransportationType" name="TransportationType" required>
                             <option value="PUJ">PUJ</option>
                             <option value="Modernized PUJ">Modernized PUJ</option>
@@ -98,17 +98,17 @@
                         </select>
                     </div>
                     <div class="input-field">
-                        <label for="id_email">Email<span class="required">*</span></label>
+                        <label for="id_email">Email<span style="color: red;" class="required">*</span></label>
                         <input type="email" class="form-control" id="id_email" name="email" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_username">Username<span class="required">*</span></label>
+                        <label for="id_username">Username<span style="color: red;" class="required">*</span></label>
                         <input type="text" class="form-control" id="id_username" name="username" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_gender">Gender<span class="required">*</span></label>
+                        <label for="id_gender">Gender<span style="color: red;" class="required">*</span></label>
                         <select class="form-control" id="id_gender" name="gender" required>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -117,12 +117,12 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="id_password1">Password<span class="required">*</span></label>
+                        <label for="id_password1">Password<span style="color: red;" class="required">*</span></label>
                         <input type="password" class="form-control" id="id_password1" name="password1" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_password2">Confirm Password<span class="required">*</span></label>
+                        <label for="id_password2">Confirm Password<span style="color: red;" class="required">*</span></label>
                         <input type="password" class="form-control" id="id_password2" name="password2" required>
                     </div>
 
@@ -138,19 +138,34 @@
 
         <div class="form second">
             <div class="details address">
-                <span class="title" style="color: #007EA7; padding-bottom: 5px;">
-                    For your safety, please fill in your emergency contact person’s information.
-                </span>
 
                 <div class="fields1">
                     <div class="input-field1">
-                        <label for="id_contactPerson" style=" padding-bottom: 10px;">Contact Person's Name<span class="required">*</span></label><br>
+                        <label for="id_contactPerson" style=" padding-bottom: 10px;">Contact Person's Name<span style="color: red;" class="required">*</span></label><br>
                         <input type="text" class="form-control1" id="id_contactPerson" name="contactPerson"  required>
                     </div>
 
                     <div class="input-field1" style="padding-top: 10px;">
-                        <label for="id_emergencyContact" style=" padding-bottom: 10px;">Emergency Contact Number<span class="required">*</span></label><br>
+                        <label for="id_emergencyContact" style=" padding-bottom: 10px;">Emergency Contact Number<span style="color: red;" class="required">*</span></label><br>
                         <input type="tel" class="form-control1" id="id_emergencyContact" name="emergencyContact" placeholder="09*********" required>
+                    </div>
+
+                    <span class="title" style="color: #007EA7; padding-bottom: 5px;">
+                        Route information
+                    </span>
+
+                    <div class="input-field1" style="padding-top: 10px;">
+                        <label for="routeKM" style=" padding-bottom: 10px;">Route KM<span style="color: red;" class="required">*</span></label><br>
+                        <input type="tel" class="form-control1" id="routeKM" name="routeKM" placeholder="0.00" required>
+                    </div>
+
+                    <div class="input-field1" style="padding-top: 10px;">
+                        <label for="routeName" style=" padding-bottom: 10px;">Route Name<span style="color: red;" class="required">*</span></label><br>
+                        <select class="form-control" id="routeName" name="routeName" required>
+                            <option value="Kalaw-Project6">Kalaw-Project6</option>
+                            <option value="Recto-Gasak">Recto-Gasak</option>
+                            <option value="Gastambide-B.balic">Gastambide-B.balic</option>
+                        </select>
                     </div>
 
                     <div class="tacbox">

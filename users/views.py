@@ -21,7 +21,6 @@ from .tokens import account_activation_token
 from .forms import UserUpdateForm
 from .forms import PasswordResetForm
 from django.db.models.query_utils import Q
-
 from users.models import CustomUser
 
 
@@ -68,7 +67,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
+        messages.success(request, 'Thank you for confirming your email. Your account is pending admin approval. You will receive an email once it is activated.')
         return redirect('login')
     else:
         messages.error(request, 'Activation link is invalid!')
@@ -76,8 +75,6 @@ def activate(request, uidb64, token):
     return redirect('login')
 
 
-
-# Create your views here.
 @user_not_authenticated
 def registerCommuter(request):
     placeholders = {
@@ -137,14 +134,13 @@ def registerCommuter(request):
     )
 
 
-@login_required
 def custom_logout(request):
     logout(request)
     messages.info(request, "Logged out successfully!")
     return redirect("welcome")
 
 
-@user_not_authenticated  # Assuming you have a custom decorator for unauthenticated users
+@user_not_authenticated 
 def custom_login(request):
     if request.method == 'POST':
         form = UserLoginForm(request=request, data=request.POST)
@@ -183,7 +179,7 @@ def custom_login(request):
         context={'form': form}
     )
 
-@login_required
+ 
 def profile(request, username):
     if request.method == 'POST':
         user = request.user
@@ -203,8 +199,6 @@ def profile(request, username):
         return render(request, 'profile.html', context={'form': form})
 
 
-
-@login_required
 def password_change(request):
     user = request.user
     if request.method == 'POST':
@@ -219,9 +213,6 @@ def password_change(request):
 
     form = SetPasswordForm(user)
     return render(request, 'reset.html', {'form': form})
-
-
-
 
 
 @user_not_authenticated
@@ -268,6 +259,7 @@ def password_reset_request(request):
         template_name="password_reset.html", 
         context={"form": form}
         )
+
 
 def passwordResetConfirm(request, uidb64, token):
     User = get_user_model()

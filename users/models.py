@@ -47,6 +47,8 @@ class CustomUser(AbstractUser):
     verified = models.BooleanField(default=False, null=True, blank= True)
     UserGroup = models.CharField(max_length=100, null=True, blank=True)
     TransportationType = models.CharField(max_length=100,choices= carType, null=True, blank=True, default='None')
+    routeKM = models.FloatField(null=True, blank=True, default=0)
+    routeName = models.CharField(null=True, blank=True)
 
 
 

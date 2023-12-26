@@ -1,0 +1,20 @@
+Subject: TransitSync - Deduction Notification
+
+Dear {{ user.username }},
+
+TransitSync has deducted the full fare for a one-way trip of the {{ user.TransportationType }} from your account due to non-compliance with the transportation agreement.
+
+Details of the deduction:
+- Date: {{ record.scan_date }}
+- Transportation Code: {{ record.TranspoSN }}
+- Transportation Type: {{ user.TransportationType }}
+- Route Name: {{ user.routeName }}
+- Deducted Amount: Full Fare
+- Violation: Non-compliance with the transportation agreement
+
+If you have any questions or concerns, please contact TransitSync support.
+
+Thank you for your understanding.
+
+Best regards,
+TransitSync
