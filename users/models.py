@@ -48,7 +48,7 @@ class CustomUser(AbstractUser):
     UserGroup = models.CharField(max_length=100, null=True, blank=True)
     TransportationType = models.CharField(max_length=100,choices= carType, null=True, blank=True, default='None')
     routeKM = models.FloatField(null=True, blank=True, default=0)
-    routeName = models.CharField(null=True, blank=True)
+    routeName = models.CharField(null=True, blank=True, max_length=100)
 
 
 

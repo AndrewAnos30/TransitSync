@@ -40,12 +40,12 @@
 
                 <div class="fields">
                     <div class="input-field">
-                        <label for="id_first_name">First Name</label>
+                        <label for="id_first_name">First Name<span class="required">*</span></label>
                         <input type="text" class="form-control" id="id_first_name" name="first_name" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_last_name">Last Name</label>
+                        <label for="id_last_name">Last Name<span class="required">*</span></label>
                         <input type="text" class="form-control" id="id_last_name" name="last_name" required>
                     </div>
 
@@ -55,17 +55,17 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="id_age">Age</label>
+                        <label for="id_age">Age<span class="required">*</span></label>
                         <input type="number" class="form-control" id="id_age" name="age" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_birthDate">Date of Birth</label>
+                        <label for="id_birthDate">Date of Birth<span class="required">*</span></label>
                         <input type="date" class="form-control" id="id_birthDate" name="birthDate" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_contactNumber">Contact Number</label>
+                        <label for="id_contactNumber">Contact Number<span class="required">*</span></label>
                         <input type="tel" class="form-control" id="id_contactNumber" name="contactNumber" placeholder="09*********"  maxlength="11" required>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
 
                 <div class="fields">
                     <div class="input-field">
-                        <label for="id_status">Status</label>
+                        <label for="id_status">Status<span class="required">*</span></label>
                         <select class="form-control" id="id_status" name="status" required>
                             <option value="Ordinary">Ordinary</option>
                             <option value="PWD">PWD</option>
@@ -90,17 +90,17 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="id_email">Email</label>
+                        <label for="id_email">Email<span class="required">*</span></label>
                         <input type="email" class="form-control" id="id_email" name="email" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_username">Username</label>
+                        <label for="id_username">Username<span class="required">*</span></label>
                         <input type="text" class="form-control" id="id_username" name="username" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_gender">Gender</label>
+                        <label for="id_gender">Gender<span class="required">*</span></label>
                         <select class="form-control" id="id_gender" name="gender" required>
                             <option value="M">Male</option>
                             <option value="F">Female</option>
@@ -109,12 +109,12 @@
                     </div>
 
                     <div class="input-field">
-                        <label for="id_password1">Password</label>
+                        <label for="id_password1">Password<span class="required">*</span></label>
                         <input type="password" class="form-control" id="id_password1" name="password1" required>
                     </div>
 
                     <div class="input-field">
-                        <label for="id_password2">Confirm Password</label>
+                        <label for="id_password2">Confirm Password<span class="required">*</span></label>
                         <input type="password" class="form-control" id="id_password2" name="password2" required>
                     </div>
 
@@ -139,12 +139,12 @@
 
                 <div class="fields1">
                     <div class="input-field1">
-                        <label for="id_contactPerson" style=" padding-bottom: 10px;">Contact Person's Name</label><br>
+                        <label for="id_contactPerson" style=" padding-bottom: 10px;">Contact Person's Name<span class="required">*</span></label><br>
                         <input type="text" class="form-control1" id="id_contactPerson" name="contactPerson"  required>
                     </div>
 
                     <div class="input-field1" style="padding-top: 10px;">
-                        <label for="id_emergencyContact" style=" padding-bottom: 10px;">Emergency Contact Number</label><br>
+                        <label for="id_emergencyContact" style=" padding-bottom: 10px;">Emergency Contact Number<span class="required">*</span></label><br>
                         <input type="tel" class="form-control1" id="id_emergencyContact" name="emergencyContact" placeholder="09*********" required>
                     </div>
 
@@ -246,6 +246,11 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+}
+
+.required {
+    color: red;
+    margin-left: 3px; /* Adjust the spacing as needed */
 }
 body{
     min-height: 100vh;
